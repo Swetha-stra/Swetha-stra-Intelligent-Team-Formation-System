@@ -1,17 +1,42 @@
 package teammate;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import java.util.List;
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        Scanner input = new Scanner(System.in);
+        FileManager fileManager = new FileManager();
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+        System.out.println("=== TeamMate: Intelligent Team Formation System ===");
+        System.out.print("Enter path to participant CSV file: ");
+        String path = input.nextLine();
+
+        List<Participant> participants = fileManager.loadParticipants(path);
+        System.out.println("Loaded " + participants.size() + " participants.");
+
+        System.out.print("Enter desired team size: ");
+        int teamSize = input.nextInt();
+
+        TeamBuilder builder = new TeamBuilder(teamSize);
+        DataProcessorThread thread = new DataProcessorThread(builder, participants);
+        thread.start();
+
+        try {
+            thread.join(); // wait until thread finishes
+        } catch (InterruptedException e) {
+            System.err.println("Thread interrupted: " + e.getMessage());
         }
+
+        List<Team> teams = thread.getFormedTeams();
+        if (teams != null) {
+            for (Team t : teams) {
+                System.out.println(t);
+            }
+
+            fileManager.saveTeams("formed_teams.csv", teams);
+        }
+
+        System.out.println("All done! Results saved in formed_teams.csv");
     }
 }
