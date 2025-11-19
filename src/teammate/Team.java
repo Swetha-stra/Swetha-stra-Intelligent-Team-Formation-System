@@ -9,7 +9,7 @@ public class Team {
 
     public Team(String teamName) {
         this.teamName = teamName;
-        this.members = new ArrayList<>();
+        this.members =   new ArrayList<>();
     }
 
     public String getTeamName() {
