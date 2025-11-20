@@ -1,9 +1,7 @@
 package teammate;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
+import java.util.ArrayList;
 
 public class TeamBuilder {
 
@@ -14,22 +12,21 @@ public class TeamBuilder {
     }
 
     public List<Team> formTeams(List<Participant> participants) {
+
         List<Team> teams = new ArrayList<>();
 
-        if (participants == null || participants.isEmpty()) {
-            System.out.println("No participants available.");
-            return teams;
-        }
-
-        // Shuffle list for randomization within fairness constraints
-        Collections.shuffle(participants, new Random());
+        // Sort by skill (descending)
+        participants.sort(
+                Comparator.comparingInt(Participant::getSkillLevel).reversed()
+        );
 
         int teamCount = (int) Math.ceil((double) participants.size() / teamSize);
+
         for (int i = 0; i < teamCount; i++) {
-            Team team = new Team("Team-" + (i + 1));
-            teams.add(team);
+            teams.add(new Team("Team-" + (i + 1)));
         }
 
+        // Round-robin distributes top skill evenly
         int index = 0;
         for (Participant p : participants) {
             teams.get(index % teamCount).addMember(p);
