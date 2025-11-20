@@ -19,7 +19,7 @@ public class FileManager {
 
                 String[] data = line.split(",");
 
-                if (data.length < 8) {
+                if (data.length < 7) {
                     System.err.println("Skipping incomplete line: " + line);
                     continue;
                 }
@@ -28,20 +28,15 @@ public class FileManager {
                 String name = data[1].trim();
                 String email = data[2].trim();
                 String game = data[3].trim();
-                int skill = Integer.parseInt(data[4].trim());
-                String role = data[5].trim();
+                String role = data[4].trim();
+                int skill = Integer.parseInt(data[5].trim());
                 int score = Integer.parseInt(data[6].trim());
-                String personalityType = data[7].trim();
+
+                // Generate personality using classifier
+                String personalityType = PersonalityClassifier.classify(score);
 
                 Participant p = new Participant(
-                        id,
-                        name,
-                        email,
-                        game,
-                        skill,
-                        role,
-                        score,
-                        personalityType
+                        id, name, email, game, skill, role, score, personalityType
                 );
 
                 participants.add(p);
