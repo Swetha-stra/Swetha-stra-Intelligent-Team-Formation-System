@@ -54,4 +54,30 @@ public class FileManager {
 
         return participants;
     }
+
+    public void saveTeams(String filePath, List<Team> teams) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+
+            writer.write("Team Name,Member Name,Email,Game,Role,Skill,Personality\n");
+
+            for (Team team : teams) {
+                for (Participant p : team.getMembers()) {
+                    writer.write(String.format("%s,%s,%s,%s,%s,%d,%s\n",
+                            team.getTeamName(),
+                            p.getName(),
+                            p.getEmail(),
+                            p.getGamePreference(),
+                            p.getRole(),
+                            p.getSkillLevel(),
+                            p.getPersonalityType()));
+                }
+            }
+
+            System.out.println("Teams successfully saved to " + filePath);
+
+        } catch (IOException e) {
+            System.err.println("Error writing file: " + e.getMessage());
+        }
+    }
+
 }
