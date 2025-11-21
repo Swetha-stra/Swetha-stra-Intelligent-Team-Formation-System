@@ -1,29 +1,114 @@
 package teammate;
 
-import java.util.List;
-import java.util.Scanner;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 
 public class Main {
+
+    private static final Scanner scanner = new Scanner(System.in);
+
+    private static final List<String> ALLOWED_GAMES = Arrays.asList(
+            "Chess", "FIFA", "Basketball", "CS:GO", "DOTA 2", "Valorant"
+    );
+
+    private static final List<String> ALLOWED_ROLES = Arrays.asList(
+            "strategist", "attacker", "defender", "supporter", "coordinator"
+    );
+
     public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n=== TeamMate: Intelligent Team Formation System ===");
+            System.out.println("1. Participant - Join and add your details");
+            System.out.println("2. Organizer - Form teams");
+            System.out.println("3. Exit");
+
+            int choice = getValidatedInt("Select an option (1-3): ", 1, 3);
+
+            if (choice == 3) {
+                System.out.println("Exiting program. Goodbye!");
+                break;
+            }
+
+            if (choice == 1) {
+                handleParticipantMode();
+            } else if (choice == 2) {
+                handleOrganizerMode();
+            }
+        }
+    }
+
+    // =====================================================================
+    // PARTICIPANT MODE
+    // =====================================================================
+
+    private static void handleParticipantMode() {
+        System.out.print("Enter CSV file path where your data should be saved: ");
+        String filePath = scanner.nextLine();
+
+        try (FileWriter fw = new FileWriter(filePath, true)) {
+
+            System.out.println("Enter your details:");
+
+            String id = getValidatedString("ID: ");
+            String name = getValidatedString("Name: ");
+            String email = getValidatedEmail("Email: ");
+
+            String game = chooseGame();
+            int skill = getValidatedInt("Skill Level (1-10): ", 1, 10);
+            String role = chooseRole();
+
+            // ==== PERSONALITY QUESTIONS ====
+            System.out.println("\nRate each statement 1–5 (1 = Strongly Disagree, 5 = Strongly Agree)");
+
+            int q1 = getValidatedInt("Q1: I enjoy taking the lead: ", 1, 5);
+            int q2 = getValidatedInt("Q2: I think strategically: ", 1, 5);
+            int q3 = getValidatedInt("Q3: I work well in teams: ", 1, 5);
+            int q4 = getValidatedInt("Q4: I stay calm under pressure: ", 1, 5);
+            int q5 = getValidatedInt("Q5: I make quick decisions: ", 1, 5);
+
+            int personalityScore = q1 + q2 + q3 + q4 + q5;
+            String type = PersonalityClassifier.classify(personalityScore);
+
+            fw.write(String.format(
+                    "%s,%s,%s,%s,%d,%s,%d,%s\n",
+                    id, name, email, game, skill, role, personalityScore, type
+            ));
+
+            System.out.println("You have been added successfully!");
+
+        } catch (IOException e) {
+            System.err.println("Error writing to CSV: " + e.getMessage());
+        }
+    }
+
+    // =====================================================================
+    // ORGANIZER MODE
+    // =====================================================================
+
+    private static void handleOrganizerMode() {
+
         FileManager fileManager = new FileManager();
 
-        System.out.println("=== TeamMate: Intelligent Team Formation System ===");
         System.out.print("Enter path to participant CSV file: ");
-        String path = input.nextLine();
+        String path = scanner.nextLine();
 
         List<Participant> participants = fileManager.loadParticipants(path);
-        System.out.println("Loaded " + participants.size() + " participants.");
 
-        System.out.print("Enter desired team size: ");
-        int teamSize = input.nextInt();
+        if (participants.isEmpty()) {
+            System.err.println("Error: No participants found! Cannot form teams.");
+            return;
+        }
+
+        int teamSize = getValidatedInt("Enter desired team size: ", 1, 100);
 
         TeamBuilder builder = new TeamBuilder(teamSize);
         DataProcessorThread thread = new DataProcessorThread(builder, participants);
         thread.start();
 
         try {
-            thread.join(); // wait until thread finishes
+            thread.join();
         } catch (InterruptedException e) {
             System.err.println("Thread interrupted: " + e.getMessage());
         }
@@ -38,5 +123,82 @@ public class Main {
         }
 
         System.out.println("All done! Results saved in formed_teams.csv");
+    }
+
+    // =====================================================================
+    // VALIDATION METHODS
+    // =====================================================================
+
+    private static String getValidatedString(String msg) {
+        while (true) {
+            System.out.print(msg);
+            String value = scanner.nextLine().trim();
+            if (!value.isEmpty()) return value;
+            System.out.println("Input cannot be empty. Try again.");
+        }
+    }
+
+    private static String getValidatedEmail(String msg) {
+        while (true) {
+            System.out.print(msg);
+            String email = scanner.nextLine().trim();
+            if (email.contains("@") && email.contains(".")) return email;
+            System.out.println("Invalid email format. Try again.");
+        }
+    }
+
+    private static int getValidatedInt(String msg, int min, int max) {
+        while (true) {
+            try {
+                System.out.print(msg);
+                int value = Integer.parseInt(scanner.nextLine());
+                if (value >= min && value <= max) return value;
+                System.out.println("Value must be between " + min + " and " + max + ".");
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid number. Try again.");
+            }
+        }
+    }
+
+    // =====================================================================
+    // GAME & ROLE MENUS
+    // =====================================================================
+
+    private static String chooseGame() {
+        System.out.println("\nSelect Game:");
+        for (int i = 0; i < ALLOWED_GAMES.size(); i++) {
+            System.out.println((i + 1) + ". " + ALLOWED_GAMES.get(i));
+        }
+
+        while (true) {
+            System.out.print("Enter option (1-" + ALLOWED_GAMES.size() + "): ");
+            try {
+                int choice = Integer.parseInt(scanner.nextLine());
+                if (choice >= 1 && choice <= ALLOWED_GAMES.size()) {
+                    return ALLOWED_GAMES.get(choice - 1);
+                }
+            } catch (Exception ignored) {}
+
+            System.out.println("Invalid choice. Try again.");
+        }
+    }
+
+    private static String chooseRole() {
+        System.out.println("\nSelect Role:");
+        for (int i = 0; i < ALLOWED_ROLES.size(); i++) {
+            System.out.println((i + 1) + ". " + ALLOWED_ROLES.get(i));
+        }
+
+        while (true) {
+            System.out.print("Enter option (1-" + ALLOWED_ROLES.size() + "): ");
+            try {
+                int choice = Integer.parseInt(scanner.nextLine());
+                if (choice >= 1 && choice <= ALLOWED_ROLES.size()) {
+                    return ALLOWED_ROLES.get(choice - 1);
+                }
+            } catch (Exception ignored) {}
+
+            System.out.println("Invalid choice. Try again.");
+        }
     }
 }
