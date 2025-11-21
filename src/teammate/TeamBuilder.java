@@ -1,7 +1,6 @@
 package teammate;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
 public class TeamBuilder {
 
@@ -15,18 +14,17 @@ public class TeamBuilder {
 
         List<Team> teams = new ArrayList<>();
 
-        // Sort by skill (descending)
-        participants.sort(
-                Comparator.comparingInt(Participant::getSkillLevel).reversed()
-        );
+        // Sort by skill (high → low)
+        participants.sort((a, b) -> Integer.compare(b.getSkillLevel(), a.getSkillLevel()));
 
         int teamCount = (int) Math.ceil((double) participants.size() / teamSize);
 
+        // Create empty teams
         for (int i = 0; i < teamCount; i++) {
             teams.add(new Team("Team-" + (i + 1)));
         }
 
-        // Round-robin distributes top skill evenly
+        // Round-robin assignment
         int index = 0;
         for (Participant p : participants) {
             teams.get(index % teamCount).addMember(p);
