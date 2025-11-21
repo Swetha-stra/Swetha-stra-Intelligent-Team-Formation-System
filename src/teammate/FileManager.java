@@ -36,7 +36,7 @@ public class FileManager {
                     String personalityType = PersonalityClassifier.classify(score);
 
                     Participant p = new Participant(
-                            id, name, email, game, skill, role , score, personalityType
+                            id, name, email, game, skill, role, score, personalityType
                     );
 
                     participants.add(p);
