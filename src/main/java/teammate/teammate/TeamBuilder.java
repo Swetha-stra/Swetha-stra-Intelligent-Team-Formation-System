@@ -1,4 +1,4 @@
-package teammate;
+package teammate.teammate;
 
 import java.util.*;
 
