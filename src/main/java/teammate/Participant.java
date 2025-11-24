@@ -1,4 +1,4 @@
-package teammate.teammate;
+package teammate;
 
 public class Participant {
 
