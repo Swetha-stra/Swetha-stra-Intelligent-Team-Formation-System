@@ -1,4 +1,4 @@
-package teammate.teammate;
+package teammate;
 
 import java.util.ArrayList;
 import java.util.List;
