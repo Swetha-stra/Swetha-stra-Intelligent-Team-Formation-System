@@ -1,4 +1,4 @@
-package teammate.teammate;
+package teammate;
 
 import java.io.FileWriter;
 import java.io.IOException;
