@@ -12,25 +12,12 @@ public class Team {
         this.members = new ArrayList<>();
     }
 
-    public String getTeamName() {
-        return teamName;
-    }
+    public String getTeamName() { return teamName; }
+    public List<Participant> getMembers() { return members; }
 
-    public List<Participant> getMembers() {
-        return members;
-    }
-
-    public void addMember(Participant participant) {
-        members.add(participant);
-    }
-
-    public void removeMember(Participant participant) {
-        members.remove(participant);
-    }
-
-    public int getTeamSize() {
-        return members.size();
-    }
+    public void addMember(Participant participant) { members.add(participant); }
+    public void removeMember(Participant participant) { members.remove(participant); }
+    public int getTeamSize() { return members.size(); }
 
     @Override
     public String toString() {
