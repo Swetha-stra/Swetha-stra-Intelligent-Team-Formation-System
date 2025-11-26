@@ -10,7 +10,7 @@ P008,Participant_8,user8@university.edu,Valorant,10,Defender,81,Balanced
 P009,Participant_9,user9@university.edu,CS:GO,6,Supporter,62,Thinker
 P010,Participant_10,user10@university.edu,Valorant,5,Coordinator,96,Leader
 P011,Participant_11,user11@university.edu,Basketball,8,Strategist,84,Balanced
-P012,Participant_12,user12@university.edu,DOTA 2,3,Attacker,63,Thinker
+P012,Participant_12,user12@university.edu,DOTA,2,Attacker,63,Thinker
 P013,Participant_13,user13@university.edu,DOTA 2,4,Defender,97,Leader
 P014,Participant_14,user14@university.edu,FIFA,3,Supporter,73,Balanced
 P015,Participant_15,user15@university.edu,DOTA 2,8,Coordinator,66,Thinker
@@ -100,9 +100,17 @@ P098,Participant_98,user98@university.edu,CS:GO,5,Defender,83,Balanced
 P099,Participant_99,user99@university.edu,Valorant,3,Supporter,66,Thinker
 P100,Participant_100,user100@university.edu,CS:GO,7,Coordinator,97,Leader
 1,swetha,swetha@gmail.com,chess,2,-,5,Invalid Score
-33,swetha,swetha,-,2,2,22,Invalid Score
 22,swetha,dew@gmail.com,Chess,4,Supporter,33,Invalid Score
 22,swe,swe@gmail.com,FIFA,2,attacker,18,Invalid Score
 33,swe,swe@gmail.com,Chess,4,defender,14,Invalid Score
 33,swe,swe@gmail.com,Valorant,6,defender,15,Invalid Score
 009,kvi,k@f.c,Chess,9,strategist,25,Invalid Score
+005,lidi,lidi@g.com,Basketball,6,coordinator,25,Leader
+004,dewdu,dew@dd.com,DOTA 2,6,attacker,25,Leader
+004,lisa,lisa@l.com,FIFA,5,supporter,25,Leader
+066,yen,yen@g.com,Valorant,6,defender,25,Leader
+008,ken,ken@g.com,Basketball,7,supporter,25,Leader
+006,jane,jane@g.com,Basketball,9,defender,25,Leader
+008,kau,kau@g.com,CS:GO,5,coordinator,25,Leader
+009,ben,ben@g.com,FIFA,5,supporter,25,Leader
+004,sam,sam@g.com,Basketball,5,defender,25,Leader

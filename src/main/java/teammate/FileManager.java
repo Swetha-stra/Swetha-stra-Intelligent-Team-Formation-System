@@ -1,23 +1,23 @@
 package teammate;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileManager {
 
     public List<Participant> loadParticipants(String filePath) {
 
         List<Participant> participants = new ArrayList<>();
-        Set<String> seenEmails = new HashSet<>();
-        Set<String> seenIDs = new HashSet<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 
-            String line = reader.readLine(); // skip header
+            String line = reader.readLine(); // Skip header row
 
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
 
+                // Split correctly even if commas appear inside quotes
                 String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
                 if (data.length < 8) {
@@ -30,29 +30,17 @@ public class FileManager {
                     String name = data[1].trim();
                     String email = data[2].trim();
                     String game = data[3].trim();
+
                     int skill = Integer.parseInt(data[4].trim());
                     String role = data[5].trim();
-                    int personalityScore = Integer.parseInt(data[6].trim());
-                    String personalityType = data[7].trim();
+                    int score = Integer.parseInt(data[6].trim());
 
-                    // Skip duplicates
-                    if (seenEmails.contains(email) || seenIDs.contains(id)) {
-                        System.out.println("⚠ Duplicate participant skipped: " + name + " (" + email + ")");
-                        continue;
-                    }
-
-                    seenEmails.add(email);
-                    seenIDs.add(id);
-
-                    // Validation
+                    // -------------------------------
+                    // VALIDATION LOGIC
+                    // -------------------------------
                     if (skill < 1 || skill > 10) {
-                        System.out.println("⚠ Invalid skill level. Skipped: " + line);
-                        continue;
-                    }
-
-                    if (personalityScore < 5 || personalityScore > 25) {
-                        System.out.println("⚠ Invalid personality score. Skipped: " + line);
-                        continue;
+                        System.out.println("⚠ Invalid skill level. Adjusted to nearest valid: " + line);
+                        skill = Math.max(1, Math.min(skill, 10));
                     }
 
                     if (!email.contains("@")) {
@@ -61,17 +49,14 @@ public class FileManager {
                     }
 
                     if (role.isEmpty() || role.equals("-")) {
-                        System.out.println("⚠ Invalid role. Skipped: " + line);
-                        continue;
+                        role = "Supporter"; // default role
                     }
 
-                    // Automatically classify personality if type is invalid
-                    if (personalityType.equalsIgnoreCase("Invalid Score")) {
-                        personalityType = PersonalityClassifier.classify(personalityScore);
-                    }
+                    // Classify personality even if score > 25
+                    String personalityType = PersonalityClassifier.classify(score);
 
                     Participant participant = new Participant(
-                            id, name, email, game, skill, role, personalityScore, personalityType
+                            id, name, email, game, skill, role, score, personalityType
                     );
 
                     participants.add(participant);
@@ -88,6 +73,9 @@ public class FileManager {
         return participants;
     }
 
+    // ----------------------------------------------------
+    // SAVE TEAMS INTO CSV
+    // ----------------------------------------------------
     public void saveTeams(String filePath, List<Team> teams) {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {

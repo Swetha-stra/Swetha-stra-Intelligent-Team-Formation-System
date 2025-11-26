@@ -8,10 +8,9 @@ public class Participant {
     private String gamePreference;    // Chess, FIFA, etc.
     private int skillLevel;           // 1–10
     private String role;              // Strategist, Attacker, Defender...
-    private int personalityScore;     // 0–100
+    private int personalityScore;     // 0–25
     private String personalityType;   // Leader, Balanced, Thinker...
 
-    // Constructor for FileManager
     public Participant(String id, String name, String email,
                        String gamePreference, int skillLevel,
                        String role, int personalityScore,
@@ -50,7 +49,7 @@ public class Participant {
     @Override
     public String toString() {
         return String.format(
-                "%s | %s (%s)\nGame: %s | Role: %s | Skill: %d\nPersonality: %s (%d)\n",
+                "%s | %s (%s)\nGame: %s | Role: %s | Skill: %d\nPersonality: %s (%d)",
                 id, name, email,
                 gamePreference, role, skillLevel,
                 personalityType, personalityScore
