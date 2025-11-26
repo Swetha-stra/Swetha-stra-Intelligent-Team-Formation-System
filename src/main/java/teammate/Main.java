@@ -31,17 +31,10 @@ public class Main {
                 break;
             }
 
-            if (choice == 1) {
-                handleParticipantMode();
-            } else if (choice == 2) {
-                handleOrganizerMode();
-            }
+            if (choice == 1) handleParticipantMode();
+            else if (choice == 2) handleOrganizerMode();
         }
     }
-
-    // =====================================================================
-    // PARTICIPANT MODE
-    // =====================================================================
 
     private static void handleParticipantMode() {
         System.out.print("Enter CSV file path where your data should be saved: ");
@@ -54,12 +47,10 @@ public class Main {
             String id = getValidatedString("ID: ");
             String name = getValidatedString("Name: ");
             String email = getValidatedEmail("Email: ");
-
             String game = chooseGame();
             int skill = getValidatedInt("Skill Level (1-10): ", 1, 10);
             String role = chooseRole();
 
-            // ==== PERSONALITY QUESTIONS ====
             System.out.println("\nRate each statement 1–5 (1 = Strongly Disagree, 5 = Strongly Agree)");
 
             int q1 = getValidatedInt("Q1: I enjoy taking the lead: ", 1, 5);
@@ -82,10 +73,6 @@ public class Main {
             System.err.println("Error writing to CSV: " + e.getMessage());
         }
     }
-
-    // =====================================================================
-    // ORGANIZER MODE
-    // =====================================================================
 
     private static void handleOrganizerMode() {
 
@@ -114,20 +101,13 @@ public class Main {
         }
 
         List<Team> teams = thread.getFormedTeams();
-        if (teams != null) {
-            for (Team t : teams) {
-                System.out.println(t);
-            }
-
+        if (!teams.isEmpty()) {
+            for (Team t : teams) System.out.println(t);
             fileManager.saveTeams("formed_teams.csv", teams);
         }
 
         System.out.println("All done! Results saved in formed_teams.csv");
     }
-
-    // =====================================================================
-    // VALIDATION METHODS
-    // =====================================================================
 
     private static String getValidatedString(String msg) {
         while (true) {
@@ -160,44 +140,32 @@ public class Main {
         }
     }
 
-    // =====================================================================
-    // GAME & ROLE MENUS
-    // =====================================================================
-
     private static String chooseGame() {
         System.out.println("\nSelect Game:");
-        for (int i = 0; i < ALLOWED_GAMES.size(); i++) {
+        for (int i = 0; i < ALLOWED_GAMES.size(); i++)
             System.out.println((i + 1) + ". " + ALLOWED_GAMES.get(i));
-        }
 
         while (true) {
             System.out.print("Enter option (1-" + ALLOWED_GAMES.size() + "): ");
             try {
                 int choice = Integer.parseInt(scanner.nextLine());
-                if (choice >= 1 && choice <= ALLOWED_GAMES.size()) {
-                    return ALLOWED_GAMES.get(choice - 1);
-                }
+                if (choice >= 1 && choice <= ALLOWED_GAMES.size()) return ALLOWED_GAMES.get(choice - 1);
             } catch (Exception ignored) {}
-
             System.out.println("Invalid choice. Try again.");
         }
     }
 
     private static String chooseRole() {
         System.out.println("\nSelect Role:");
-        for (int i = 0; i < ALLOWED_ROLES.size(); i++) {
+        for (int i = 0; i < ALLOWED_ROLES.size(); i++)
             System.out.println((i + 1) + ". " + ALLOWED_ROLES.get(i));
-        }
 
         while (true) {
             System.out.print("Enter option (1-" + ALLOWED_ROLES.size() + "): ");
             try {
                 int choice = Integer.parseInt(scanner.nextLine());
-                if (choice >= 1 && choice <= ALLOWED_ROLES.size()) {
-                    return ALLOWED_ROLES.get(choice - 1);
-                }
+                if (choice >= 1 && choice <= ALLOWED_ROLES.size()) return ALLOWED_ROLES.get(choice - 1);
             } catch (Exception ignored) {}
-
             System.out.println("Invalid choice. Try again.");
         }
     }
