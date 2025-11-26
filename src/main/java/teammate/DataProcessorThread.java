@@ -1,10 +1,12 @@
 package teammate;
 
 import java.util.List;
+import java.util.ArrayList;
 
 public class DataProcessorThread extends Thread {
-    private TeamBuilder teamBuilder;
-    private List<Participant> participants;
+
+    private final List<Participant> participants;
+    private final TeamBuilder teamBuilder;
     private List<Team> formedTeams;
 
     public DataProcessorThread(TeamBuilder teamBuilder, List<Participant> participants) {
@@ -14,12 +16,11 @@ public class DataProcessorThread extends Thread {
 
     @Override
     public void run() {
-        System.out.println("Thread started: Processing data...");
-        formedTeams = teamBuilder.formTeams(participants);
-        System.out.println("Thread finished: Team formation complete!");
+        System.out.println("Processing and forming teams in background thread...");
+        formedTeams = teamBuilder.buildBalancedTeams(participants);
     }
 
     public List<Team> getFormedTeams() {
-        return formedTeams;
+        return formedTeams != null ? formedTeams : new ArrayList<>();
     }
 }
