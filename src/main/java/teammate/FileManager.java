@@ -12,80 +12,117 @@ public class FileManager {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 
-            String line = reader.readLine(); // Skip header row
+            String line = reader.readLine(); // Skip header
 
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
 
-                // Split correctly even if commas appear inside quotes
-                String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                // --- FIXED: Parse CSV safely (supports quotes, commas, etc) ---
+                List<String> cells = parseCSVLine(line);
 
-                if (data.length < 8) {
+                if (cells.size() < 8) {
                     System.err.println("⚠ Skipping incomplete row: " + line);
                     continue;
                 }
 
                 try {
-                    String id = data[0].trim();
-                    String name = data[1].trim();
-                    String email = data[2].trim();
-                    String game = data[3].trim();
+                    String id = cells.get(0).trim();
+                    String name = cells.get(1).trim();
+                    String email = cells.get(2).trim();
 
-                    int skill = Integer.parseInt(data[4].trim());
-                    String role = data[5].trim();
-                    int score = Integer.parseInt(data[6].trim());
+                    String game = normalizeGame(cells.get(3).trim());
+                    int skill = Integer.parseInt(cells.get(4).trim());
 
-                    // -------------------------------
-                    // VALIDATION LOGIC
-                    // -------------------------------
-                    if (skill < 1 || skill > 10) {
-                        System.out.println("⚠ Invalid skill level. Adjusted to nearest valid: " + line);
-                        skill = Math.max(1, Math.min(skill, 10));
-                    }
+                    String role = normalizeRole(cells.get(5).trim());
+                    int score = Integer.parseInt(cells.get(6).trim());
 
-                    if (!email.contains("@")) {
-                        System.out.println("⚠ Invalid email. Skipped: " + line);
-                        continue;
-                    }
-
-                    if (role.isEmpty() || role.equals("-")) {
-                        role = "Supporter"; // default role
-                    }
-
-                    // Classify personality even if score > 25
                     String personalityType = PersonalityClassifier.classify(score);
 
-                    Participant participant = new Participant(
+                    Participant p = new Participant(
                             id, name, email, game, skill, role, score, personalityType
                     );
 
-                    participants.add(participant);
+                    participants.add(p);
 
-                } catch (NumberFormatException e) {
-                    System.err.println("⚠ Number format error. Skipped: " + line);
+                } catch (Exception e) {
+                    System.err.println("⚠ Error parsing: " + line);
                 }
             }
 
         } catch (IOException e) {
-            System.err.println("❌ Error reading file: " + e.getMessage());
+            System.err.println("Error reading file: " + e.getMessage());
         }
 
         return participants;
     }
 
-    // ----------------------------------------------------
-    // SAVE TEAMS INTO CSV
-    // ----------------------------------------------------
+    // ===========================================
+    // SAFE CSV PARSER
+    // ===========================================
+    private List<String> parseCSVLine(String line) {
+        List<String> result = new ArrayList<>();
+        boolean inQuotes = false;
+        StringBuilder sb = new StringBuilder();
+
+        for (char c : line.toCharArray()) {
+            if (c == '"') {
+                inQuotes = !inQuotes;
+            } else if (c == ',' && !inQuotes) {
+                result.add(sb.toString());
+                sb.setLength(0);
+            } else {
+                sb.append(c);
+            }
+        }
+
+        result.add(sb.toString());
+        return result;
+    }
+
+    // ===========================================
+    // NORMALIZATION FUNCTIONS
+    // ===========================================
+    private String normalizeGame(String g) {
+        g = g.replace("\"", "").trim().toLowerCase();
+        switch (g) {
+            case "chess": return "Chess";
+            case "fifa": return "FIFA";
+            case "basketball": return "Basketball";
+            case "cs:go":
+            case "csgo": return "CS:GO";
+            case "dota":
+            case "dota2":
+            case "dota 2": return "DOTA 2";
+            case "valorant": return "Valorant";
+            default: return "Unknown"; // Never break team formation
+        }
+    }
+
+    private String normalizeRole(String r) {
+        r = r.replace("\"", "").trim().toLowerCase();
+        switch (r) {
+            case "strategist": return "Strategist";
+            case "attacker": return "Attacker";
+            case "defender": return "Defender";
+            case "supporter": return "Supporter";
+            case "coordinator": return "Coordinator";
+            default: return "Supporter";
+        }
+    }
+
+    // ===========================================
+    // SAVE TEAMS
+    // ===========================================
     public void saveTeams(String filePath, List<Team> teams) {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
 
             writer.write("Team Name,Member Name,Email,Game,Role,Skill,Personality\n");
 
-            for (Team team : teams) {
-                for (Participant p : team.getMembers()) {
+            for (Team t : teams) {
+                for (Participant p : t.getMembers()) {
                     writer.write(String.format("%s,%s,%s,%s,%s,%d,%s\n",
-                            team.getTeamName(),
+                            t.getTeamName(),
                             p.getName(),
                             p.getEmail(),
                             p.getGamePreference(),
@@ -95,10 +132,10 @@ public class FileManager {
                 }
             }
 
-            System.out.println("✔ Teams successfully saved to: " + filePath);
+            System.out.println("✔ Teams saved to: " + filePath);
 
         } catch (IOException e) {
-            System.err.println("❌ Error writing file: " + e.getMessage());
+            System.err.println("Error writing file: " + e.getMessage());
         }
     }
 }

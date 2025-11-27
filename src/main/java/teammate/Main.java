@@ -22,17 +22,21 @@ public class Main {
             System.out.println("\n=== TeamMate: Intelligent Team Formation System ===");
             System.out.println("1. Participant - Join and add your details");
             System.out.println("2. Organizer - Form teams");
-            System.out.println("3. Exit");
+            System.out.println("3. View Formed Teams");
+            System.out.println("4. Exit");
 
-            int choice = getValidatedInt("Select an option (1-3): ", 1, 3);
+            int choice = getValidatedInt("Select an option (1-4): ", 1, 4);
 
-            if (choice == 3) {
+            if (choice == 4) {
+
                 System.out.println("Exiting program. Goodbye!");
                 break;
             }
 
             if (choice == 1) handleParticipantMode();
             else if (choice == 2) handleOrganizerMode();
+            else if (choice == 3) handleViewTeams();
+
         }
     }
 
@@ -169,4 +173,57 @@ public class Main {
             System.out.println("Invalid choice. Try again.");
         }
     }
+
+    private static void handleViewTeams() {
+        System.out.print("Enter path to formed teams CSV file: ");
+        String filePath = scanner.nextLine();
+
+        try (Scanner fileScanner = new Scanner(new java.io.File(filePath))) {
+
+            if (!fileScanner.hasNextLine()) {
+                System.out.println("⚠ File is empty.");
+                return;
+            }
+
+            System.out.println("\n=== VIEW FORMED TEAMS ===");
+
+            String currentTeam = "";
+
+            while (fileScanner.hasNextLine()) {
+                String line = fileScanner.nextLine();
+
+                String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+
+                if (data.length < 7) {
+                    System.out.println("⚠ Invalid row: " + line);
+                    continue;
+                }
+
+                String teamName = data[0].replace("\"", "");
+                String member = data[1].replace("\"", "");
+                String email = data[2].replace("\"", "");
+                String game = data[3].replace("\"", "");
+                String role = data[4].replace("\"", "");
+                String skill = data[5].replace("\"", "");
+                String personality = data[6].replace("\"", "");
+
+                if (!teamName.equals(currentTeam)) {
+                    currentTeam = teamName;
+                    System.out.println("\n-----------------------------");
+                    System.out.println("Team: " + currentTeam);
+                    System.out.println("-----------------------------");
+                }
+
+                System.out.println("• " + member + " (" + email + ")");
+                System.out.println("  Game: " + game);
+                System.out.println("  Role: " + role);
+                System.out.println("  Skill: " + skill);
+                System.out.println("  Personality: " + personality);
+            }
+
+        } catch (IOException e) {
+            System.out.println(" Error reading file: " + e.getMessage());
+        }
+    }
+
 }

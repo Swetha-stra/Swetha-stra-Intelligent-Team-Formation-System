@@ -19,12 +19,16 @@ public class TeamBuilder {
             return teams;
         }
 
-        int numTeams = Math.max(1, (int) Math.ceil((double) participants.size() / teamSize));
+        // Normalize: remove nulls
+        participants.removeIf(Objects::isNull);
+
+        int numTeams = (int) Math.ceil((double) participants.size() / teamSize);
 
         for (int i = 1; i <= numTeams; i++) {
             teams.add(new Team("Team " + i));
         }
 
+        // Highest skill first
         participants.sort((p1, p2) ->
                 Integer.compare(p2.getSkillLevel(), p1.getSkillLevel())
         );
