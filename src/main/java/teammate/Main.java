@@ -1,6 +1,5 @@
 package teammate;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
@@ -44,39 +43,37 @@ public class Main {
         System.out.print("Enter CSV file path where your data should be saved: ");
         String filePath = scanner.nextLine();
 
-        try (FileWriter fw = new FileWriter(filePath, true)) {
+        System.out.println("Enter your details:");
 
-            System.out.println("Enter your details:");
+        String id = getValidatedString("ID: ");
+        String name = getValidatedString("Name: ");
+        String email = getValidatedEmail("Email: ");
+        String game = chooseGame();
+        int skill = getValidatedInt("Skill Level (1-10): ", 1, 10);
+        String role = chooseRole();
 
-            String id = getValidatedString("ID: ");
-            String name = getValidatedString("Name: ");
-            String email = getValidatedEmail("Email: ");
-            String game = chooseGame();
-            int skill = getValidatedInt("Skill Level (1-10): ", 1, 10);
-            String role = chooseRole();
+        System.out.println("\nRate each statement 1–5 (1 = Strongly Disagree, 5 = Strongly Agree)");
 
-            System.out.println("\nRate each statement 1–5 (1 = Strongly Disagree, 5 = Strongly Agree)");
+        int q1 = getValidatedInt("Q1: I enjoy taking the lead: ", 1, 5);
+        int q2 = getValidatedInt("Q2: I think strategically: ", 1, 5);
+        int q3 = getValidatedInt("Q3: I work well in teams: ", 1, 5);
+        int q4 = getValidatedInt("Q4: I stay calm under pressure: ", 1, 5);
+        int q5 = getValidatedInt("Q5: I make quick decisions: ", 1, 5);
 
-            int q1 = getValidatedInt("Q1: I enjoy taking the lead: ", 1, 5);
-            int q2 = getValidatedInt("Q2: I think strategically: ", 1, 5);
-            int q3 = getValidatedInt("Q3: I work well in teams: ", 1, 5);
-            int q4 = getValidatedInt("Q4: I stay calm under pressure: ", 1, 5);
-            int q5 = getValidatedInt("Q5: I make quick decisions: ", 1, 5);
+        int personalityScore = q1 + q2 + q3 + q4 + q5;
+        String type = PersonalityClassifier.classify(personalityScore);
 
-            int personalityScore = q1 + q2 + q3 + q4 + q5;
-            String type = PersonalityClassifier.classify(personalityScore);
+        // Create Participant object
+        Participant participant = new Participant(
+                id, name, email, game, skill, role, personalityScore, type
+        );
 
-            fw.write(String.format(
-                    "%s,%s,%s,%s,%d,%s,%d,%s\n",
-                    id, name, email, game, skill, role, personalityScore, type
-            ));
-
-            System.out.println("You have been added successfully!");
-
-        } catch (IOException e) {
-            System.err.println("Error writing to CSV: " + e.getMessage());
-        }
+        // Save via FileManager
+        FileManager fileManager = new FileManager();
+        fileManager.saveParticipant(filePath, participant);
     }
+
+
 
     private static void handleOrganizerMode() {
 
@@ -181,7 +178,7 @@ public class Main {
         try (Scanner fileScanner = new Scanner(new java.io.File(filePath))) {
 
             if (!fileScanner.hasNextLine()) {
-                System.out.println("⚠ File is empty.");
+                System.out.println("File is empty.");
                 return;
             }
 
@@ -195,7 +192,7 @@ public class Main {
                 String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
                 if (data.length < 7) {
-                    System.out.println("⚠ Invalid row: " + line);
+                    System.out.println("Invalid row: " + line);
                     continue;
                 }
 
@@ -222,7 +219,7 @@ public class Main {
             }
 
         } catch (IOException e) {
-            System.out.println(" Error reading file: " + e.getMessage());
+            System.out.println("Error reading file: " + e.getMessage());
         }
     }
 

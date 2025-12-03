@@ -5,10 +5,10 @@ public class PersonalityClassifier {
     /**
      * Classify a personality score that may be on different scales.
      * Accepts scores from 0 up to 100 and returns one of:
-     *   Leader, Balanced, Thinker, Reserved
-     *
+     * Leader, Balanced, Thinker, Reserved
      * Keeps behaviour sensible if someone still provides 5-25.
      */
+
     public static String classify(int score) {
 
         // clamp to 0-100 just in case

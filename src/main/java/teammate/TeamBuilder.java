@@ -15,7 +15,7 @@ public class TeamBuilder {
         List<Team> teams = new ArrayList<>();
 
         if (participants == null || participants.isEmpty()) {
-            System.out.println("⚠ No participants available to form teams.");
+            System.out.println("No participants available to form teams.");
             return teams;
         }
 

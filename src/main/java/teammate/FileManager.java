@@ -12,16 +12,15 @@ public class FileManager {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 
-            String line = reader.readLine(); // Skip header
+            String line = reader.readLine();
 
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
 
-                // --- FIXED: Parse CSV safely (supports quotes, commas, etc) ---
                 List<String> cells = parseCSVLine(line);
 
                 if (cells.size() < 8) {
-                    System.err.println("⚠ Skipping incomplete row: " + line);
+                    System.err.println("Skipping incomplete row: " + line);
                     continue;
                 }
 
@@ -56,9 +55,9 @@ public class FileManager {
         return participants;
     }
 
-    // ===========================================
-    // SAFE CSV PARSER
-    // ===========================================
+
+    // CSV PARSER
+
     private List<String> parseCSVLine(String line) {
         List<String> result = new ArrayList<>();
         boolean inQuotes = false;
@@ -79,9 +78,9 @@ public class FileManager {
         return result;
     }
 
-    // ===========================================
+
     // NORMALIZATION FUNCTIONS
-    // ===========================================
+
     private String normalizeGame(String g) {
         g = g.replace("\"", "").trim().toLowerCase();
         switch (g) {
@@ -94,7 +93,7 @@ public class FileManager {
             case "dota2":
             case "dota 2": return "DOTA 2";
             case "valorant": return "Valorant";
-            default: return "Unknown"; // Never break team formation
+            default: return "Unknown";   // Never break team formation
         }
     }
 
@@ -110,9 +109,30 @@ public class FileManager {
         }
     }
 
-    // ===========================================
+
+    // Save a single participant to CSV (append mode)
+    public void saveParticipant(String filePath, Participant p) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+            writer.write(String.format("%s,%s,%s,%s,%d,%s,%d,%s\n",
+                    p.getId(),
+                    p.getName(),
+                    p.getEmail(),
+                    p.getGamePreference(),
+                    p.getSkillLevel(),
+                    p.getRole(),
+                    p.getPersonalityScore(),
+                    p.getPersonalityType()
+            ));
+            System.out.println("Participant saved successfully!");
+        } catch (IOException e) {
+            System.err.println("Error writing participant to CSV: " + e.getMessage());
+        }
+    }
+
+
+
     // SAVE TEAMS
-    // ===========================================
+
     public void saveTeams(String filePath, List<Team> teams) {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
